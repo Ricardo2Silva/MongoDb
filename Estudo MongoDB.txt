@@ -1,0 +1,202 @@
+# Para criar uma colecao
+
+db.createCollection("Alunos")
+
+#Para inserir dentro da colecao
+
+db.Alunos.insert(
+
+	{
+		"nome":"Ricardo",
+		"data_nascimento":new Date(1991,05,24)
+	}
+
+);
+
+#Para procurar dados
+
+db.Aluno.find()
+
+Ele vai buscar o objeto por inteiro
+Ele retorna todos os objetos
+
+#Removendo dados
+
+db.Alunos.remove(
+	"_id":ObjectId("a2sd4as65d4das2d1dd")	
+)
+
+*passamos a query com o parametro para saber de que forma ele vai remover,seja por Id ou nome e etc.
+
+#consultando e filtrando dados
+
+Quando utilizamos  a funcao find(),ele nos retorna todos da colecao,entretanto ele nos traz a informacao ilegivel,nesse caso utilizamos a funcao pretty() apos o find()
+
+db.Alunos.find().pretty()
+
+nos trazendo de forma organizada os objetos.
+
+#filtracao de dados
+
+vejamos um exemplo
+
+{
+	"nome":"Ricardo jonas",
+	"data_nascimento": "1991,05,24",
+	"habilidades":[
+	"nome":"Ingles",
+	"nivel":"Basico"
+	]
+}
+
+Suponhamos que estamos buscando um aluno que tem o conhecimento em ingles
+
+entao ficaria assim na busca 
+
+db.Alunos.find(
+	"habilidades.nome": "ingles"
+).pretty
+
+#Filtrando mais de um dado na mesma query
+
+db.Alunos.find(
+	$or:[
+		{"curso.nome": "sistema de informacao"},
+		{"curso.nome": "Engenharia Quimica"}
+
+	]
+
+).pretty()
+
+
+# utilizando o operador in
+
+deve ser utilizado dentro de um objeto onde o campo a ser pesquisado e os parametros dentro de um array
+
+db.Alunos.find(
+	{		
+		"curso.nome":{
+			$ in:["sistema de informacao, Engenharia Quimica"]
+		}			
+	}
+).pretty()
+
+# Atualizando atraves do update
+
+para o update devemos passar dois parametros, o 1º é a query que vamos mudar,a 2º é o novo valor seguido da palavra set
+
+Vamos ao exemplo:
+
+quero mudar o nome do curso de farmacia para Farmacia e Bioquimica
+
+entao vai ficar assim:
+
+db.Alunos.update(
+	{"curso.nome":"farmacia"}
+	
+	{
+		$set:{"curso.nome": "Farmacia e Bioquimica"}
+	}
+)
+
+ Obs: nesse caso ele faz apenas atualizacao do primeiro documento que ele encontra caso queira trocar em todos os documentos ficara assim:
+
+db.Alunos.update(
+	{"curso.nome":"farmacia"}
+	
+	{
+		$set:{"curso.nome": "Farmacia e Bioquimica"}
+	},
+	{
+		multi: true
+	}
+)
+
+#utilizando o operator push
+
+Digamos que preciso colocar uma nota dentro de um objeto aluno
+
+ficaria assim:
+
+Nesse caso passamos o id do aluno para ser inserido a nota como 1º parametro,em seguida passamos o 2º parametro para adicionar anota seguido da palavra push
+
+db.Alunos.update(
+
+	{"_id":ObjectId("a2sd4as65d4das2d1dd")}
+
+	{
+		$push:{"notas":8.5}
+	}
+)
+
+E se quisermos adicionar mais de uma nota? é possivel?
+
+db.Alunos.update(
+
+	{"_id":ObjectId("a2sd4as65d4das2d1dd")}
+
+	{
+		$push:{"notas":´[8.5, 3]}
+	}
+)
+
+Entretanto se usarmos dessa forma,ao buscar os dados ele vai adicionar o array completo,e nao queremos as notas dentro de um array,so queremos as notas,uma vez que as notas ja estarao inseridas dentro de um array entao ficaria assim:
+
+#utilizando o operador each
+
+db.Alunos.update(
+
+	{"_id":ObjectId("a2sd4as65d4das2d1dd")}
+
+	{
+		$push:	{
+			"notas":{$each:[8.5, 3]}
+		}
+	}
+)
+
+
+ o operador each quer dizer para cada,"para cada" nota que esta dentro do array empurre para dentro de notas sem o array.
+
+ 
+# utilizando operadores logicos
+
+quero buscar um aluno com uma determinada nota
+
+db.Alunos.find(
+	{
+		"notas": 8.5
+	}
+	
+)
+
+Entretanto,quando vier o resultado da query ele vai trazer apenas um resultado e nao quero isso,quero que ele traga mais alunos,nesse caso a query fica assim:
+
+
+db.Alunos.find(
+	{
+		"notas":{$gt :5} 
+	}
+	
+)
+
+gt é abreviacao de greater than que significa maior que,no exemplo acima ele vai buscar todos alunos que tiver a nota maior que 5,passara dentro do array de notas e caso seja true,retornara os alunos com a nota maior que 5
+
+# utilizando o findone()
+
+Busca apenas o primeiro elemento,mas e se por acaso quero mais 3 elementos como fica?
+e tambem quero que seja em ordem alfabetica?
+Vamos para o proximo exemplo:
+
+#Ordenando uma lista e limitando ela
+
+db.Alunos.find().sort({"nome":1}).limit(3)
+
+o sort é responsavel pelo ordenamento o 1 significa em ordem crescente,deve receber o parametro atraves de um objeto.
+
+o limit é responsavel pela limitacao de busca
+
+
+
+
+
